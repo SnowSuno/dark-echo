@@ -1,6 +1,6 @@
 import type { p5 } from "p5-svelte";
 import type { Vector } from "p5";
-import type { GameState, SoundState } from "../lib/functional.test";
+import type { GameState, SoundState } from "../state/interface";
 
 export const render = (p5: p5, state: GameState) => {
   p5.background(0);

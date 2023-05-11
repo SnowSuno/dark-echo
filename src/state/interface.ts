@@ -13,11 +13,13 @@ interface WallState {
   endPos: p5.Vector;
 }
 
-export interface SoundState {
+export interface SoundVertex {
+  position: p5.Vector;
   velocity: p5.Vector;
-  trace: p5.Vector[];
-  volume: number;
+  intensity: number;
 }
+
+export type SoundState = SoundVertex[];
 
 export interface GameState {
   timestamp: number;
