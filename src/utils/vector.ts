@@ -18,23 +18,26 @@ const mutableOperations: (string | symbol)[] = [
   "reflect",
 ];
 
-export const ImmutableVector = new Proxy(Vector, {
-  construct: (target, args) => Object.seal(
-    new Proxy(new target(...args), {
-      get: (target, prop) => {
-        if (mutableOperations.includes(prop)) {
-          console.log(prop)
-        }
+const freezeVectorMethods = (vector: Vector) => new Proxy(vector, {
+  get: (target, prop) => {
+    if (
+      typeof target[prop] === "function"
+      && mutableOperations.includes(prop)
+    ) return function(...args) {
+      return freezeVectorMethods(target.copy()[prop](...args));
+    };
 
-        // console.log("target", target);
-        // console.log("prop", prop);
-        // console.log("receiver", receiver);
-        // console.log(typeof target[prop]);
-        return target.copy()[prop];
-      },
-    }),
+    return target[prop];
+  },
+});
+
+
+export const ImmutableVector = new Proxy(Vector, {
+  construct: (target, args) => Object.freeze(
+    freezeVectorMethods(new target(...args)),
   ),
 });
 
-const vector = new Vector(0, 0, 0);
-
+export const createImmutableVector = (x?: number, y?: number, z?: number) => {
+  return new ImmutableVector(x, y, z);
+}
