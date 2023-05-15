@@ -1,12 +1,6 @@
 import type { Sketch } from "p5-svelte";
-import { createSoundState, initialState, next } from "~/game.old";
-import { render } from "~/elements/render";
-import type { GameState } from "~/state/interface";
-import { Entity } from "~/elements/base";
-import { Sound } from "~/elements/sound";
-import { Wall } from "~/elements/wall";
 
-let state: GameState;
+import { Entity, Sound, Wall } from "~/elements";
 
 const DEBUG = false;
 
@@ -20,12 +14,6 @@ export const sketch: Sketch = (p5) => {
 
     Entity.injectP5(p5);
 
-    // sounds.push(new Sound(vector(p5.width / 2, p5.height / 2), 0, {
-    //   intensity: 255,
-    //   color: [255, 255, 255]
-    // }));
-
-    // state = initialState(p5);
     sounds = [];
 
     walls = [
@@ -53,9 +41,6 @@ export const sketch: Sketch = (p5) => {
   };
 
   p5.touchStarted = () => {
-    sounds.push(
-      ...Sound.createWave(p5.createVector(p5.mouseX, p5.mouseY)),
-    );
-    // state = createSoundState(p5)(state);
+    sounds.push(...Sound.createWave(p5.createVector(p5.mouseX, p5.mouseY)));
   };
 };
