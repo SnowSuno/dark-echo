@@ -1,6 +1,6 @@
 import type { Sketch } from "p5-svelte";
 
-import { Entity, Sound, Wall } from "~/elements";
+import { Entity, Sound, Wall } from "~/entities";
 
 const DEBUG = false;
 

@@ -1,5 +1,5 @@
 import type { Vector } from "p5";
-import { Entity } from "~/elements/base";
+import { Entity } from "~/entities/base";
 
 export class Wall extends Entity {
   position: Vector;

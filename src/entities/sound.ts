@@ -1,6 +1,6 @@
 import type { Vector } from "p5";
-import { Entity } from "~/elements/base";
-import type { Wall } from "~/elements/wall";
+import { Entity } from "~/entities/base";
+import type { Wall } from "~/entities/wall";
 
 type Color = [number, number, number, number];
 
