@@ -32,16 +32,25 @@ export class Sound extends Entity {
       .map(angle => new Sound(pos, angle));
   }
 
+  get head() {
+    return this.trace.at(-1);
+  }
+
   next() {
     this.timestamp += this.p5.deltaTime;
 
-    const head = this.trace.at(-1);
-    if (!head) throw new Error("Sound trace is empty");
+    this.move();
+  }
 
-    // this.trace.push(head.getNext(this.velocity, p5));
+  move() {
     this.trace = [
       ...this.trace,
-      head.getNext(this.velocity),
+      new SoundPoint(
+        this.p5.createVector()
+          .add(this.velocity)
+          .mult(this.p5.deltaTime)
+          .add(this.head.position),
+      ),
     ].slice(-100);
   }
 
@@ -89,14 +98,5 @@ class SoundPoint extends Entity {
     return this.position.x > this.p5.width / 2
       ? "default"
       : "death";
-  }
-
-  getNext(velocity: Vector) {
-    return new SoundPoint(
-      this.p5.createVector()
-        .add(velocity)
-        .mult(this.p5.deltaTime)
-        .add(this.position),
-    );
   }
 }
