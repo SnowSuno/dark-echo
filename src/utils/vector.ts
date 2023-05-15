@@ -38,6 +38,6 @@ export const ImmutableVector = new Proxy(Vector, {
   ),
 });
 
-export const createImmutableVector = (x?: number, y?: number, z?: number) => {
+export const vector = (x?: number, y?: number, z?: number) => {
   return new ImmutableVector(x, y, z);
 }

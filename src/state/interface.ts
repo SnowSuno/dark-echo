@@ -1,4 +1,4 @@
-import type p5 from "p5";
+import type { Vector } from "p5";
 
 interface EntityState {
 
@@ -8,18 +8,26 @@ interface PlayerState {
 
 }
 
-interface WallState {
-  startPos: p5.Vector;
-  endPos: p5.Vector;
+export interface WallState {
+  position: Vector;
+  direction: Vector;
 }
 
-export interface SoundVertex {
-  position: p5.Vector;
-  velocity: p5.Vector;
+export interface SoundAttributes {
   intensity: number;
+  color: string;
 }
 
-export type SoundState = SoundVertex[];
+export interface SoundPoint {
+  position: Vector;
+  transition?: Partial<SoundAttributes>;
+}
+
+export interface SoundState {
+  velocity: Vector;
+  trace: SoundPoint[];
+  attributes: SoundAttributes;
+}
 
 export interface GameState {
   timestamp: number;
