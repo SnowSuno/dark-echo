@@ -24,7 +24,7 @@ const freezeVectorMethods = (vector: Vector) => new Proxy(vector, {
       typeof target[prop] === "function"
       && mutableOperations.includes(prop)
     ) return function(...args) {
-      return freezeVectorMethods(target.copy()[prop](...args));
+      return freezeVectorMethods((new Vector).add(target)[prop](...args));
     };
 
     return target[prop];

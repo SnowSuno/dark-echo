@@ -1,4 +1,5 @@
 import type { Vector } from "p5";
+import type { Sound } from "~/elements/sound";
 
 interface EntityState {
 
@@ -13,25 +14,8 @@ export interface WallState {
   direction: Vector;
 }
 
-export interface SoundAttributes {
-  intensity: number;
-  color: string;
-}
 
-export interface SoundPoint {
-  position: Vector;
-  transition?: Partial<SoundAttributes>;
-}
-
-export interface SoundState {
-  velocity: Vector;
-  trace: SoundPoint[];
-  attributes: SoundAttributes;
-}
 
 export interface GameState {
-  timestamp: number;
-  player: PlayerState;
-  walls: WallState[];
-  sounds: SoundState[];
+  sounds: Sound[];
 }
