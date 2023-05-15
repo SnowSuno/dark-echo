@@ -4,11 +4,14 @@ import { render } from "~/elements/render";
 import type { GameState } from "~/state/interface";
 import { Entity } from "~/elements/base";
 import { Sound } from "~/elements/sound";
-import { vector } from "~/utils/vector";
+import { Wall } from "~/elements/wall";
 
 let state: GameState;
 
-const sounds: Sound[] = [];
+const DEBUG = false;
+
+let sounds: Sound[];
+let walls: Wall[];
 
 export const sketch: Sketch = (p5) => {
   p5.setup = () => {
@@ -23,6 +26,12 @@ export const sketch: Sketch = (p5) => {
     // }));
 
     // state = initialState(p5);
+    sounds = [];
+
+    walls = [
+      new Wall(p5.createVector(200, 100), p5.createVector(600, 100)),
+      new Wall(p5.createVector(800, 800), p5.createVector(500, -400)),
+    ];
   };
 
   p5.windowResized = () => {
@@ -32,16 +41,20 @@ export const sketch: Sketch = (p5) => {
 
   p5.draw = () => {
     p5.background(0);
-    sounds.map(sound => sound.render());
-    sounds.map(sound => sound.next());
 
-    // render(p5, state);
-    // state = next(p5)(state);
+    for (const sound of sounds) {
+      sound.render();
+      sound.next(walls);
+    }
+
+    if (DEBUG) {
+      walls.map(wall => wall.render());
+    }
   };
 
   p5.touchStarted = () => {
     sounds.push(
-      ...Sound.createWave(p5.createVector(p5.mouseX, p5.mouseY), p5),
+      ...Sound.createWave(p5.createVector(p5.mouseX, p5.mouseY)),
     );
     // state = createSoundState(p5)(state);
   };

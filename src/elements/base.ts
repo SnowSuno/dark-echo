@@ -11,11 +11,8 @@ export class Entity {
     return Entity.p5;
   }
 
-  render() {
+  public render() {
   };
-
-  next() {
-  }
 
   static injectP5(p5: p5) {
     Entity.p5 = p5;

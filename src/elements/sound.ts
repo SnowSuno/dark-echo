@@ -1,5 +1,6 @@
 import type { Vector } from "p5";
 import { Entity } from "~/elements/base";
+import type { Wall } from "~/elements/wall";
 
 type Color = [number, number, number, number];
 
@@ -14,9 +15,9 @@ const colors: Record<State, (t: number) => Color> = {
 };
 
 export class Sound extends Entity {
-  timestamp: number;
-  velocity: Vector;
-  trace: SoundPoint[];
+  private timestamp: number;
+  private velocity: Vector;
+  private trace: SoundPoint[];
 
   constructor(pos: Vector, angle: number) {
     super();
@@ -26,23 +27,43 @@ export class Sound extends Entity {
     this.trace = [new SoundPoint(pos)];
   }
 
-  static createWave(pos: Vector): Sound[] {
+  public static createWave(pos: Vector): Sound[] {
     return [...Array(RAYS).keys()]
       .map(n => n * this.p5.TWO_PI / RAYS)
       .map(angle => new Sound(pos, angle));
   }
 
-  get head() {
+  private get head() {
     return this.trace.at(-1);
   }
 
-  next() {
+  public willBeRemoved() {
+    return decay(this.timestamp) < 10;
+  }
+
+  public next(walls: Wall[]) {
     this.timestamp += this.p5.deltaTime;
 
+    this.handleCollision(walls);
     this.move();
   }
 
-  move() {
+  private handleCollision(walls: Wall[]) {
+    const delta = this.p5
+      .createVector()
+      .add(this.velocity)
+      .mult(this.p5.deltaTime);
+
+
+    for (const wall of walls) {
+      if (wall.collide(this.head.position, delta)) {
+        this.velocity.reflect(wall.normal);
+        return;
+      }
+    }
+  }
+
+  private move() {
     this.trace = [
       ...this.trace,
       new SoundPoint(
@@ -54,10 +75,11 @@ export class Sound extends Entity {
     ].slice(-100);
   }
 
-  render() {
+  public render() {
     this.p5.noFill();
     this.p5.strokeWeight(5);
     this.p5.strokeCap(this.p5.SQUARE);
+    this.p5.strokeJoin(this.p5.BEVEL);
 
     groupPaths(this.trace).forEach(points => {
       this.p5.stroke(colors[points[0].state](this.timestamp));
