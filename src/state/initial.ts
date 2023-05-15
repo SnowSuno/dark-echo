@@ -1,13 +1,13 @@
-import type { p5 } from "p5-svelte";
 import type { GameState } from "./interface";
+import { vector } from "~/utils/vector";
 
-export const initialState = (p5: p5): GameState => ({
+export const initialState = (): GameState => ({
   timestamp: 0,
   player: {},
   walls: [
     {
-      startPos: p5.createVector(0, p5.height / 2),
-      endPos: p5.createVector(p5.width, p5.height / 2),
+      position: vector(0, 100),
+      direction: vector(100, 0),
     },
   ],
   sounds: [],
