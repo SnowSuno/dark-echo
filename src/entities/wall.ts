@@ -1,5 +1,6 @@
 import type { Vector } from "p5";
 import { Entity } from "~/entities/base";
+import { v } from "~/utils/vector";
 
 export class Wall extends Entity {
   position: Vector;
@@ -12,13 +13,22 @@ export class Wall extends Entity {
   }
 
   collide(pos: Vector, delta: Vector) {
+    // const relPos = sub(pos, this.position);
+
+
+    // const yCross =
+      // rel
+
+
+
+
     const divisor = this.span.cross(delta).mag();
     if (divisor === 0) return false;
 
-    const sub = this.p5.createVector().add(pos).sub(this.position);
+    const dP = v.sub(pos, this.position);
 
-    const t = sub.cross(delta).mag() / divisor;
-    const u = sub.cross(this.span).mag() / divisor;
+    const t = dP.cross(delta).mag() / divisor;
+    const u = dP.cross(this.span).mag() / divisor;
 
     return 0 < t && t < 1
       && 0 < u && u < 1;
@@ -34,7 +44,9 @@ export class Wall extends Entity {
   }
 
   get normal() {
-    return this.p5.createVector(0, 0, 1).cross(this.span);
+    return v(0, 0, 1)
+      .cross(this.span)
+      .normalize();
   }
 }
 

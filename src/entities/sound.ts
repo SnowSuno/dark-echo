@@ -1,6 +1,7 @@
 import type { Vector } from "p5";
 import { Entity } from "~/entities/base";
 import type { Wall } from "~/entities/wall";
+import { v } from "~/utils/vector";
 
 type Color = [number, number, number, number];
 
@@ -16,14 +17,15 @@ const colors: Record<State, (t: number) => Color> = {
 
 export class Sound extends Entity {
   private timestamp: number;
-  private velocity: Vector;
+
   private trace: SoundPoint[];
+  private readonly velocity: Vector;
 
   constructor(pos: Vector, angle: number) {
     super();
 
     this.timestamp = 0;
-    this.velocity = this.p5.createVector(0.8).setHeading(angle);
+    this.velocity = v(0.8).setHeading(angle);
     this.trace = [new SoundPoint(pos)];
   }
 
@@ -49,11 +51,7 @@ export class Sound extends Entity {
   }
 
   private handleCollision(walls: Wall[]) {
-    const delta = this.p5
-      .createVector()
-      .add(this.velocity)
-      .mult(this.p5.deltaTime);
-
+    const delta = v.mult(this.velocity, this.p5.deltaTime);
 
     for (const wall of walls) {
       if (wall.collide(this.head.position, delta)) {
@@ -66,11 +64,10 @@ export class Sound extends Entity {
   private move() {
     this.trace = [
       ...this.trace,
-      new SoundPoint(
-        this.p5.createVector()
-          .add(this.velocity)
-          .mult(this.p5.deltaTime)
-          .add(this.head.position),
+      new SoundPoint(v
+        .copy(this.velocity)
+        .mult(this.p5.deltaTime)
+        .add(this.head.position),
       ),
     ].slice(-100);
   }
@@ -85,7 +82,7 @@ export class Sound extends Entity {
       this.p5.stroke(colors[points[0].state](this.timestamp));
 
       this.p5.beginShape();
-      points.forEach(point => point.renderVertex());
+      points.forEach(point => point.render());
       this.p5.endShape();
     });
 
@@ -109,15 +106,15 @@ class SoundPoint extends Entity {
 
   constructor(position: Vector) {
     super();
-    this.position = position;
+    this.position = v.copy(position);
   }
 
-  renderVertex() {
-    this.p5.vertex(this.position.x, this.position.y);
+  public render() {
+    this.p5.vertex(...v.comp(this.position));
   }
 
-  get state(): State {
-    return this.position.x > this.p5.width / 2
+  public get state(): State {
+    return this.position.x < 2000
       ? "default"
       : "death";
   }
