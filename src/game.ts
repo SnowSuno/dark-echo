@@ -2,6 +2,7 @@ import type { Sketch } from "p5-svelte";
 
 import { Entity, Player, Sound, Wall } from "~/entities";
 import { v } from "~/utils/vector";
+import { constructMap } from "~/utils/map";
 
 const DEBUG = false;
 
@@ -25,10 +26,13 @@ export const sketch: Sketch = (p5) => {
 
     sounds = [];
 
-    walls = [
-      new Wall(v(200, 100), v(600, 100)),
-      new Wall(v(800, 800), v(500, -400)),
-    ];
+    walls = constructMap([
+      [-200, -100],
+      [-200, 100],
+      [500, 100],
+      [900, 500],
+      [900, -100],
+    ])
 
   };
 
@@ -42,11 +46,11 @@ export const sketch: Sketch = (p5) => {
     p5.background(0);
     setCamera();
 
+    player.render();
     sounds.map(sound => sound.render());
 
     sounds = sounds.filter(sound => !sound.willBeRemoved());
 
-    player.render();
     if (DEBUG) {
       walls.map(wall => wall.render());
     }
