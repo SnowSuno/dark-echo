@@ -3,14 +3,48 @@ import type { Sketch } from "p5-svelte";
 import { Entity, Sound } from "~/entities";
 import { World } from "~/game/world";
 
-import { v } from "~/utils/vector";
+import footstepSound from "~/assets/foot.mp3";
+import windSound from "~/assets/wind.wav";
 
-const DEBUG = true;
+// import Pizzicato from "pizzicato";
+import { Howl } from "howler";
+
+const DEBUG = false;
 
 let world: World;
 let interval: NodeJS.Timer;
 
+let bgSound: Howl;
+let sound: Howl;
+
+let once = false;
+
 export const sketch: Sketch = (p5) => {
+  p5.preload = async () => {
+    bgSound = new Howl({
+      src: [windSound],
+      loop: true,
+    })
+
+    sound = new Howl({
+      src: [footstepSound],
+    })
+
+    // bgSound.play();
+    // bgSound = new Pizzicato.Sound({
+    //   source: "file",
+    //   options: { path: windSound, loop: true },
+    // }, () => {
+    //   bgSound.play();
+    // })
+    //
+    // sound = new Pizzicato.Sound(footstepSound, () => {
+    //   // sound.addEffect(lowPassFilter)
+    //   console.log("loaded");
+    //   // sound.addEffect(reverb);
+    // });
+  };
+
   p5.setup = () => {
     Entity.injectP5(p5);
 
@@ -18,11 +52,13 @@ export const sketch: Sketch = (p5) => {
     p5.background(0);
 
     world = World.init();
+
+    // sound.addEffect(reverb);
+    // bgSound.play();
   };
 
   p5.windowResized = () => {
     p5.resizeCanvas(p5.windowWidth, p5.windowHeight);
-    // p5.pixelDensity(p5.windowWidth / 840);
     p5.background(0);
   };
 
@@ -31,22 +67,14 @@ export const sketch: Sketch = (p5) => {
     world.next();
 
     DEBUG && world.debug();
-    // p5.background(0);
-    // setCamera();
-    //
-    // player.render();
-    // // player.renderHitboxPoints(walls);
-    // sounds.map(sound => sound.render());
-    //
-    // sounds = sounds.filter(sound => !sound.willBeRemoved());
-    //
-    // walls.map(wall => wall.render());
-    //
-    // player.next(walls);
-    // sounds.map(sounds => sounds.next(walls));
   };
 
   p5.touchStarted = () => {
+    if (!once) {
+      bgSound.play();
+      once = true;
+    }
+
     if (interval) return;
     createFootstep();
     interval = setInterval(createFootstep, 600);
@@ -58,12 +86,14 @@ export const sketch: Sketch = (p5) => {
   };
 
   const createFootstep = () => {
+    //   (new Pizzicato.Group([sound])).play();
+    // const s = sound.clone();
+    // s.addEffect(reverb);
+    // s.play();
+    // s.removeEffect(reverb);
+    sound.play();
+
     world.player.createFootstep();
-    world.sounds.push(...Sound.createWave(world.player.position));
+    world.sounds.push(...Sound.createWave(world.player.position, world.map));
   };
-
-
-  // p5.touchStarted = () => {
-  //   sounds.push(...Sound.createWave(p5.createVector(p5.mouseX, p5.mouseY)));
-  // };
 };
