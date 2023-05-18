@@ -1,15 +1,15 @@
-import { Entity, Player, Sound, WallSegment } from "~/entities";
+import { Entity, Player, Sound, type Wall } from "~/entities";
 import { constructMap } from "~/utils/map";
 import { v } from "~/utils/vector";
 
 export class World extends Entity {
   player: Player;
   sounds: Sound[];
-  walls: WallSegment[];
+  walls: Wall[];
 
   interval: NodeJS.Timer;
 
-  private constructor(player: Player, sounds: Sound[], walls: WallSegment[]) {
+  private constructor(player: Player, sounds: Sound[], walls: Wall[]) {
     super();
     this.player = player;
     this.sounds = sounds;
