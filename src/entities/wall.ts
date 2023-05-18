@@ -1,50 +1,68 @@
 import type { Vector } from "p5";
 import { Entity } from "~/entities/base";
 import { v } from "~/utils/vector";
-
-const SAFETY_AREA = 5;
+import { SAFETY_AREA, HITBOX_SIZE } from "~/constants";
 
 export class Wall extends Entity {
-  position: Vector;
+  origin: Vector;
   span: Vector;
 
   constructor(p1: Vector, p2: Vector) {
     super();
-    this.position = p1;
+    this.origin = p1;
     this.span = v.sub(p2, p1);
   }
 
-  collide(pos: Vector, delta: Vector) {
-    const P = v.sub(pos, this.position);
+  public collide(pos: Vector, delta: Vector) {
+    return this.collideRelative(this.relativeToOrigin(pos), delta);
+  }
 
-    const pSpan = v.dot(P, this.unit);
+  private collideRelative(relPos: Vector, delta: Vector) {
+    const pSpan = v.dot(relPos, this.unit);
     if (pSpan < -SAFETY_AREA
       || pSpan > this.span.mag() + SAFETY_AREA
     ) return false;
 
     return (
-      v.dot(P, this.normal)
-      * v.dot(v.add(P, delta), this.normal)
+      v.dot(relPos, this.normal)
+      * v.dot(v.add(relPos, delta), this.normal)
     ) <= 0;
-
-    // const divisor = this.span.cross(delta).mag();
-    // if (divisor === 0) return false;
-    //
-    // const dP = v.sub(pos, this.position);
-    //
-    // const t = dP.cross(delta).mag() / divisor;
-    // const u = dP.cross(this.span).mag() / divisor;
-    //
-    // return 0 < t && t < 1
-    //   && 0 < u && u < 1;
   }
 
-  render() {
-    this.p5.stroke(255);
+  public playerCorrection(pos: Vector, delta: Vector): Vector | undefined {
+    const relPos = this.relativeToOrigin(pos);
+
+    const unit = this.normal
+      .mult(v.dot(relPos, this.normal))
+      .normalize();
+
+    relPos.add(v
+      .copy(unit)
+      .mult(-HITBOX_SIZE),
+    );
+
+    if (!this.collideRelative(relPos, delta)) return;
+
+    return v
+      .copy(unit)
+      .mult(v.dot(relPos, unit));
+
+    // return v.add(this.origin, relPos);
+  }
+
+  private relativeToOrigin(vector: Vector) {
+    return v.sub(vector, this.origin);
+  }
+
+  public render() {
+  }
+
+  public debug() {
+    this.p5.stroke(...this.DEBUG_COLOR);
     this.p5.strokeWeight(1);
     this.p5.line(
-      this.position.x, this.position.y,
-      this.position.x + this.span.x, this.position.y + this.span.y,
+      this.origin.x, this.origin.y,
+      this.origin.x + this.span.x, this.origin.y + this.span.y,
     );
   }
 
