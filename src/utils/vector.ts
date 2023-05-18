@@ -8,6 +8,7 @@ export const v = Object.assign(init, {
   sub: (v1: Vector, v2: Vector) => init().add(v1).sub(v2),
   dot: (v1: Vector, v2: Vector) => init().add(v1).dot(v2),
   mult: (v1: Vector, n: number) => init().add(v1).mult(n),
+  // proj: (v1: Vector, v2: Vector) => init().add(v1).dot(v2),
   comp: (v1: Vector) => [v1.x, v1.y, v1.z] as const,
 });
 

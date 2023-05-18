@@ -2,18 +2,20 @@ import type { Vector } from "p5";
 
 import { Entity, Wall } from "~/entities";
 import { v } from "~/utils/vector";
-import { HITBOX_SIZE } from "~/constants";
+import { HITBOX_RADIUS } from "~/constants";
 
 const MOVEMENT_SPEED = 0.18;
 
 export class Player extends Entity {
   readonly position: Vector;
+  readonly size: number;
   direction: Vector;
   private readonly footsteps: Footstep[];
 
-  constructor(position = v(0, 0)) {
+  constructor(position = v(0, 0), size = HITBOX_RADIUS) {
     super();
     this.position = position;
+    this.size = size;
     this.direction = v(1, 0);
     this.footsteps = [];
   }
@@ -25,7 +27,7 @@ export class Player extends Entity {
   public debug() {
     this.p5.noStroke();
     this.p5.fill(...this.DEBUG_COLOR);
-    this.p5.circle(this.position.x, this.position.y, HITBOX_SIZE);
+    this.p5.circle(this.position.x, this.position.y, this.size * 2);
   }
 
   //  public renderHitboxPoints(walls: Wall[]) {
@@ -64,19 +66,23 @@ export class Player extends Entity {
       .copy(this.direction)
       .mult(MOVEMENT_SPEED * this.p5.deltaTime);
 
-    const corrections = walls
-      .map(wall => wall.playerCorrection(this.position, delta))
-      .filter(correction => !!correction);
+    const collisions = walls.filter(
+      wall => wall.collide(this.position, delta, this.size),
+    );
 
-    if (corrections.length > 1) return;
+    if (collisions.length > 1) return;
 
-    if (corrections.length > 0) console.log("wall meet");
+    const collidingWall = collisions.at(0);
 
-    const correction = corrections.at(0) ?? v(0, 0);
+    // const correction = corrections.at(0) ?? v(0, 0);
 
-    this.position
-      .add(delta)
-      .add(correction);
+    this.position.add(collidingWall
+      ? collidingWall.unit.mult(
+        collidingWall.unit.dot(delta),
+      )
+      : delta,
+    );
+    // .add(correction);
 
     // this.position.add(
     //   v(this.p5.mouseX, this.p5.mouseY)

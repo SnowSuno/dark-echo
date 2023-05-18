@@ -1,7 +1,7 @@
 import type { Vector } from "p5";
 import { Entity } from "~/entities/base";
 import { v } from "~/utils/vector";
-import { SAFETY_AREA, HITBOX_SIZE } from "~/constants";
+import { SAFETY_AREA, HITBOX_RADIUS } from "~/constants";
 
 export class Wall extends Entity {
   origin: Vector;
@@ -13,8 +13,22 @@ export class Wall extends Entity {
     this.span = v.sub(p2, p1);
   }
 
-  public collide(pos: Vector, delta: Vector) {
-    return this.collideRelative(this.relativeToOrigin(pos), delta);
+  public collide(pos: Vector, delta: Vector, hitbox?: number) {
+    const relPos = this.relativeToOrigin(pos);
+
+    if (hitbox) {
+      relPos.sub(this.normal
+        .mult(v.dot(relPos, this.normal))
+        .setMag(hitbox),
+      );
+
+      // relPos.add(v
+      //   .copy(unit)
+      //   .mult(-HITBOX_SIZE),
+      // );
+    }
+
+    return this.collideRelative(relPos, delta);
   }
 
   private collideRelative(relPos: Vector, delta: Vector) {
@@ -38,7 +52,7 @@ export class Wall extends Entity {
 
     relPos.add(v
       .copy(unit)
-      .mult(-HITBOX_SIZE),
+      .mult(-HITBOX_RADIUS),
     );
 
     if (!this.collideRelative(relPos, delta)) return;
