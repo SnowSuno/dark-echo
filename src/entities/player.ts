@@ -1,6 +1,6 @@
 import type { Vector } from "p5";
 
-import { Entity, Wall } from "~/entities";
+import { Entity, type Wall } from "~/entities";
 import { v } from "~/utils/vector";
 import { HITBOX_RADIUS } from "~/constants";
 
@@ -66,22 +66,17 @@ export class Player extends Entity {
       .copy(this.direction)
       .mult(MOVEMENT_SPEED * this.p5.deltaTime);
 
-    const collisions = walls.filter(
-      wall => wall.collide(this.position, delta, this.size),
-    );
+    const collisionDeltas = walls
+      .map(wall => wall.playerDelta(this.position, delta, this.size))
+      .filter(wall => !!wall);
 
-    if (collisions.length > 1) return;
+    if (collisionDeltas.length > 1) return;
 
-    const collidingWall = collisions.at(0);
+    const collisionDelta = collisionDeltas.at(0);
 
     // const correction = corrections.at(0) ?? v(0, 0);
 
-    this.position.add(collidingWall
-      ? collidingWall.unit.mult(
-        collidingWall.unit.dot(delta),
-      )
-      : delta,
-    );
+    this.position.add(collisionDelta || delta);
     // .add(correction);
 
     // this.position.add(

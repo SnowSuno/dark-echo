@@ -3,9 +3,17 @@ import { Entity } from "~/entities/base";
 import { v } from "~/utils/vector";
 import { SAFETY_AREA, HITBOX_RADIUS } from "~/constants";
 
-export class Wall extends Entity {
-  origin: Vector;
-  span: Vector;
+export interface Wall extends Entity {
+  collide(pos: Vector, delta: Vector, hitbox?: number): boolean;
+
+  reflect(vector: Vector): void;
+
+  playerDelta(pos: Vector, delta: Vector, size: number): Vector | void;
+}
+
+export class WallSegment extends Entity implements Wall {
+  private readonly origin: Vector;
+  private readonly span: Vector;
 
   constructor(p1: Vector, p2: Vector) {
     super();
@@ -16,22 +24,24 @@ export class Wall extends Entity {
   public collide(pos: Vector, delta: Vector, hitbox?: number) {
     const relPos = this.relativeToOrigin(pos);
 
-    if (hitbox) {
-      relPos.sub(this.normal
-        .mult(v.dot(relPos, this.normal))
-        .setMag(hitbox),
-      );
-
-      // relPos.add(v
-      //   .copy(unit)
-      //   .mult(-HITBOX_SIZE),
-      // );
-    }
+    if (hitbox) relPos.sub(this.normal
+      .mult(v.dot(relPos, this.normal))
+      .setMag(hitbox),
+    );
 
     return this.collideRelative(relPos, delta);
   }
 
-  private collideRelative(relPos: Vector, delta: Vector) {
+  public reflect(vector: Vector) {
+    vector.reflect(this.normal);
+  }
+
+  public playerDelta(pos: Vector, delta: Vector, size: number) {
+    if (!this.collide(pos, delta, size)) return;
+    return this.unit.mult(this.unit.dot(delta));
+  }
+
+  protected collideRelative(relPos: Vector, delta: Vector) {
     const pSpan = v.dot(relPos, this.unit);
     if (pSpan < -SAFETY_AREA
       || pSpan > this.span.mag() + SAFETY_AREA
@@ -93,3 +103,17 @@ export class Wall extends Entity {
   }
 }
 
+// TODO
+// export class WallJoint extends Entity implements Wall {
+//   private readonly origin: Vector;
+//
+//   constructor(p: Vector) {
+//     super();
+//     this.origin = p;
+//   }
+//
+//   collide(pos: Vector, delta: Vector, hitbox?: number) {
+//     return false;
+//   }
+//
+// }

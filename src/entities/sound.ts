@@ -55,8 +55,7 @@ export class Sound extends Entity {
 
     for (const wall of walls) {
       if (wall.collide(this.head.position, delta)) {
-        this.velocity.reflect(wall.normal);
-        return;
+        return wall.reflect(this.velocity);
       }
     }
   }
