@@ -45,8 +45,11 @@ export const game = (transition: Navigate, level: number): Sketch => {
       p5.bezierVertex(19.81, -27.23, 23.19, -5.77, 21.5, -21.5);
       p5.endShape();
 
-      world.map.deaths.some(death => death.contains(world.player.position)) &&
-      die();
+
+      world.map.goal.contains(world.player.position) && end(false);
+      world.map.deaths.some(
+        death => death.contains(world.player.position)
+      ) && end(true);
     };
 
     const addControls = () => {
@@ -70,14 +73,14 @@ export const game = (transition: Navigate, level: number): Sketch => {
       world.sounds.push(...Sound.createWave(world.player.position, world.map));
     };
 
-    const die = () => {
+    const end = (restart: boolean) => {
       Audio.background.fade(1, 0, 100);
       Audio.background.stop();
       Audio.footstep.fade(1, 0, 100);
       Audio.footstep.stop();
       clearInterval(interval);
       p5.remove();
-      transition("restart");
+      transition(restart ? "restart" : "next");
     };
   };
 };

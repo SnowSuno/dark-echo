@@ -1,18 +1,19 @@
 import type { Vector } from "p5";
 import { v } from "~/utils/vector";
-import { type Wall, Death, Entity } from "~/entities";
+import { type Wall, Death, Entity, Goal } from "~/entities";
 import type { Map } from "~/utils/map";
 
 type Color = [number, number, number, number];
 
 const RAYS = 20;
 
-type State = "default" | "death";
-const decay = (t: number) => 255 - 7 * Math.sqrt(t);
+type State = "default" | "death" | "goal";
+const decay = (t: number, r: number) => 255 - r * Math.sqrt(t);
 
-const colors: Record<State, (t: number) => Color> = {
-  default: t => [255, 255, 255, decay(t)],
-  death: t => [255, 0, 0, 2 * decay(t)],
+const style: Record<State, { color: (t: number) => Color, weight: number }> = {
+  default: { color: t => [255, 255, 255, decay(t ,7)], weight: 5 },
+  death: { color: t => [255, 0, 0, 2 * decay(t, 7)], weight: 5 },
+  goal: { color: t => [255, 255, 255, 3 * decay(t, 6)], weight: 8 },
 };
 
 export class Sound extends Entity {
@@ -42,7 +43,7 @@ export class Sound extends Entity {
   }
 
   public willBeRemoved() {
-    return decay(this.timestamp) < 10;
+    return decay(this.timestamp, 6) < 10;
   }
 
   public next(walls: Wall[]) {
@@ -74,17 +75,19 @@ export class Sound extends Entity {
   }
 
   private createPoint(pos: Vector) {
-    return new SoundPoint(pos, this.map.deaths);
+    return new SoundPoint(pos, this.map.deaths, this.map.goal);
   }
 
   public render() {
     this.p5.noFill();
-    this.p5.strokeWeight(5);
     this.p5.strokeCap(this.p5.SQUARE);
     this.p5.strokeJoin(this.p5.BEVEL);
 
     groupPaths(this.trace).forEach(points => {
-      this.p5.stroke(colors[points[0].state](this.timestamp));
+      const { color, weight } = style[points[0].state];
+
+      this.p5.strokeWeight(weight);
+      this.p5.stroke(color(this.timestamp));
 
       this.p5.beginShape();
       points.forEach(point => point.render());
@@ -110,13 +113,14 @@ class SoundPoint extends Entity {
   readonly position: Vector;
   readonly state: State;
 
-  constructor(position: Vector, deaths: Death[]) {
+  constructor(position: Vector, deaths: Death[], goal: Goal) {
     super();
     this.position = v.copy(position);
-    this.state = deaths
-      .some(death => death.contains(this.position))
-      ? "death"
-      : "default";
+    this.state = goal.contains(this.position)
+      ? "goal"
+      : deaths.some(death => death.contains(this.position))
+        ? "death"
+        : "default";
   }
 
   public render() {

@@ -22,6 +22,8 @@
 
 </script>
 
-<main in:fade={{delay: 1200, duration: 1000}}>
+<main
+        in:fade={{delay: 1200, duration: 1000}}
+>
     <P5 {sketch}/>
 </main>
