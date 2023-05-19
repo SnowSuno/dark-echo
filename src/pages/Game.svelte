@@ -6,6 +6,7 @@
 
   import Title from "~/pages/Game/Title.svelte";
   import Transition from "~/pages/Game/Transition.svelte";
+  import Level from "~/pages/Game/Level.svelte";
 
   let state: State = "title";
   const navigate: Navigate = newState => {
@@ -19,9 +20,10 @@
     {#if state === "title"}
         <Title {navigate}/>
     {:else if state === "game"}
-        <main in:fade={{delay: 1200, duration: 1000}}>
-            <P5 sketch={game(navigate, params.level)}/>
-        </main>
+        <Level {navigate} level={params.level}/>
+<!--        <main in:fade={{delay: 1200, duration: 1000}}>-->
+<!--            <P5 sketch={game(navigate, params.level)}/>-->
+<!--        </main>-->
     {:else if state === "restart"}
         <Transition {navigate}/>
     {:else if state === "next"}

@@ -5,7 +5,7 @@
   export let next: boolean = false;
   export let navigate: Navigate;
 
-  setTimeout(() => navigate("game"), 0);
+  setTimeout(() => navigate("game"), 1000);
 </script>
 
 <div
@@ -22,5 +22,7 @@
         left: 0;
         width: 100%;
         height: 100%;
+
+        opacity: 0.8;
     }
 </style>
