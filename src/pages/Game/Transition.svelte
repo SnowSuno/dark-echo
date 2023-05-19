@@ -2,10 +2,13 @@
   import { fade } from "svelte/transition";
   import type { Navigate } from "~/types";
 
-  export let next: boolean = false;
+  export let next: () => void;
   export let navigate: Navigate;
 
-  setTimeout(() => navigate("game"), 1000);
+  setTimeout(() => next
+      ? next()
+      : navigate("game"),
+    1000);
 </script>
 
 <div

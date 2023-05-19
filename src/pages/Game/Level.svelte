@@ -1,15 +1,20 @@
 <script lang="ts">
   import { fade } from "svelte/transition";
-  import P5, { type Sketch } from "p5-svelte";
+  import P5 from "p5-svelte";
 
   import type { Navigate } from "~/types";
   import { game } from "~/game/index.js";
-  import { onDestroy, onMount } from "svelte";
+  import type { Level } from "~/utils/map";
 
   export let navigate: Navigate;
-  export let level: number;
+  export let level: Level;
 
-  let sketch = game(navigate, level);
+  // let sketch;
+  // onMount(() => {
+  //   console.log(level);
+  //   if (level) sketch = game(navigate, level);
+  // });
+
   // onDestroy(() => {
   //   delete this.sketch;
   //   // sketch = undefined;
@@ -22,8 +27,6 @@
 
 </script>
 
-<main
-        in:fade={{delay: 1200, duration: 1000}}
->
-    <P5 {sketch}/>
+<main in:fade={{delay: 1200, duration: 1000}}>
+    <P5 sketch={game(navigate, level)}/>
 </main>

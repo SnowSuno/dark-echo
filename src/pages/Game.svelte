@@ -7,26 +7,38 @@
   import Title from "~/pages/Game/Title.svelte";
   import Transition from "~/pages/Game/Transition.svelte";
   import Level from "~/pages/Game/Level.svelte";
+  import { push } from "svelte-spa-router";
+  import { levels } from "~/levels";
 
-  let state: State = "title";
+  import { DEBUG } from "~/constants";
+
+  let state: State = DEBUG ? "game" : "title";
   const navigate: Navigate = newState => {
     state = newState;
   };
 
-  export let params = {};
+  export let params = {} as { level?: string };
+
+  $: level = levels.at(parseInt(params.level) - 1);
+  // if (!level) push("/");
+
+  // $:.level) {}
+  const next = () => {
+
+    navigate("title");
+    push(`/game/${parseInt(params.level) + 1}`);
+  };
+
 </script>
 
-{#key state}
+{#key `${params.level}-${state}`}
     {#if state === "title"}
         <Title {navigate}/>
     {:else if state === "game"}
-        <Level {navigate} level={params.level}/>
-<!--        <main in:fade={{delay: 1200, duration: 1000}}>-->
-<!--            <P5 sketch={game(navigate, params.level)}/>-->
-<!--        </main>-->
+        <Level {navigate} {level}/>
     {:else if state === "restart"}
         <Transition {navigate}/>
     {:else if state === "next"}
-        <Transition {navigate} next/>
+        <Transition {navigate} {next}/>
     {/if}
 {/key}

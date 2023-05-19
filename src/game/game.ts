@@ -5,10 +5,11 @@ import { World } from "~/game/world";
 
 import type { Navigate } from "~/types";
 import { Audio } from "~/assets/audio";
+import type { Level } from "~/utils/map";
 
-const DEBUG = false;
+import { DEBUG } from "~/constants";
 
-export const game = (transition: Navigate, level: number): Sketch => {
+export const game = (navigate: Navigate, level: Level): Sketch => {
   let world: World;
   let interval: NodeJS.Timer;
 
@@ -20,7 +21,7 @@ export const game = (transition: Navigate, level: number): Sketch => {
       p5.createCanvas(p5.windowWidth, p5.windowHeight);
       p5.background(0);
 
-      world = World.init();
+      world = World.init(level);
       Audio.background.play();
       Audio.background.fade(0, 1, 5000);
 
@@ -80,7 +81,7 @@ export const game = (transition: Navigate, level: number): Sketch => {
       Audio.footstep.stop();
       clearInterval(interval);
       p5.remove();
-      transition(restart ? "restart" : "next");
+      navigate(restart ? "restart" : "next");
     };
   };
 };
