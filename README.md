@@ -8,7 +8,7 @@
 
 [Github Repo](https://github.com/SnowSuno/dark-echo)
 &nbsp;
-[Youtube]()
+[Youtube](https://www.youtube.com/watch?v=_KkrJQGSVvU)
 
 * * *
 
