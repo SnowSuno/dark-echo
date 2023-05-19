@@ -3,6 +3,7 @@ import type { Vector } from "p5";
 import { Entity, type Wall } from "~/entities";
 import { v } from "~/utils/vector";
 import { HITBOX_RADIUS } from "~/constants";
+import { drawFootprint } from "~/assets/footprint";
 
 const MOVEMENT_SPEED = 0.18;
 
@@ -17,11 +18,15 @@ export class Player extends Entity {
     this.position = position;
     this.size = size;
     this.direction = v(1, 0);
-    this.footsteps = [];
+    this.footsteps = []
+    Array(2).fill(0).map(left => this.createFootstep());
   }
 
   public render() {
     this.footsteps.map(footstep => footstep.render());
+    // [true, false].forEach(isLeft => {
+    //   drawFootprint(this.p5, this.position, this.direction, isLeft, )
+    // });
   }
 
   public debug() {
@@ -52,7 +57,7 @@ export class Player extends Entity {
       // );
     }
 
-    this.footsteps.map(footstep => footstep.next());
+    this.footsteps.slice(0, -2).map(footstep => footstep.next());
   }
 
   private updateDirection() {
@@ -89,7 +94,11 @@ export class Player extends Entity {
   }
 
   public createFootstep() {
-    this.footsteps.push(new Footstep(this.position));
+    this.footsteps.push(new Footstep(
+      this.position,
+      this.direction,
+      !(this.footsteps.at(-1)?.left),
+    ));
   }
 
 }
@@ -98,21 +107,24 @@ class Footstep extends Entity {
   private alpha: number;
   private readonly position: Vector;
   private readonly direction: Vector;
-  private readonly left: boolean;
+  readonly left: boolean;
 
-  constructor(position: Vector) {
+  constructor(position: Vector, direction: Vector, left: boolean) {
     super();
     this.position = v.copy(position);
     this.alpha = 255;
+    this.direction = v.copy(direction);
+    this.left = left;
   }
 
   public render() {
-    this.p5.noStroke();
-    this.p5.fill(this.alpha);
-    this.p5.circle(this.position.x, this.position.y, 20);
+    // this.p5.noStroke();
+    // this.p5.fill(this.alpha);
+    // this.p5.circle(this.position.x, this.position.y, 20);
+    drawFootprint(this.p5, this.position, this.direction, this.left, this.alpha);
   }
 
   public next() {
-    this.alpha = Math.max(this.alpha - 0.1 * this.p5.deltaTime, 80);
+    this.alpha = Math.max(this.alpha - 0.1 * this.p5.deltaTime, 50);
   }
 }

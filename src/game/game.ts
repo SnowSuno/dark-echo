@@ -12,9 +12,7 @@ export const game = (transition: Navigate, level: number): Sketch => {
   let world: World;
   let interval: NodeJS.Timer;
 
-
   return (p5) => {
-
 
     p5.setup = () => {
       Entity.injectP5(p5);
@@ -35,10 +33,17 @@ export const game = (transition: Navigate, level: number): Sketch => {
     };
 
     p5.draw = () => {
+
       world.render();
       world.next();
 
       DEBUG && world.debug();
+
+      p5.fill(255);
+      p5.beginShape();
+      p5.bezierVertex(-14.77, -57, 8.77, -57, -3, -57);
+      p5.bezierVertex(19.81, -27.23, 23.19, -5.77, 21.5, -21.5);
+      p5.endShape();
 
       world.map.deaths.some(death => death.contains(world.player.position)) &&
       die();
@@ -49,7 +54,7 @@ export const game = (transition: Navigate, level: number): Sketch => {
       p5.touchStarted = () => {
         if (interval) return;
         createFootstep();
-        interval = setInterval(createFootstep, 600);
+        interval = setInterval(createFootstep, 500);
       };
 
       p5.touchEnded = () => {
