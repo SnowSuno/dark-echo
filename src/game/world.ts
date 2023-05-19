@@ -1,4 +1,4 @@
-import { Entity, Player, Sound, Death, type Wall } from "~/entities";
+import { Entity, Player, Sound, Death, type Wall, Goal } from "~/entities";
 import { constructWalls } from "~/utils/map";
 import { v } from "~/utils/vector";
 import type { Map } from "~/utils/map";
@@ -23,6 +23,7 @@ export class World extends Entity {
     return new World(
       new Player(),
       {
+        levelName: "test",
         walls: constructWalls([
           [-200, -100],
           [-200, 100],
@@ -31,6 +32,7 @@ export class World extends Entity {
           [900, -100],
         ]),
         deaths: [new Death(v(700, 300), 200, 200)],
+        goal: new Goal(v(700, -100), 200, 200),
       },
     );
   }
@@ -55,6 +57,7 @@ export class World extends Entity {
     this.player.debug();
     this.map.walls.map(wall => wall.debug());
     this.map.deaths.map(death => death.debug());
+    this.map.goal.debug();
   }
 
   private setCamera() {
