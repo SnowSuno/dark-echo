@@ -16,3 +16,6 @@ export const constructWalls = (coords: Coordinate[]): Wall[] => coords
   .map((p, i, points) =>
     new WallSegment(points.at(i - 1), p),
   );
+
+export type Level = () => Map;
+export const map = (M: () => Map): Level => M;
