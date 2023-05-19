@@ -1,7 +1,7 @@
 import type { Vector } from "p5";
-import { Entity } from "~/entities/base";
-import type { Wall } from "~/entities/wall";
 import { v } from "~/utils/vector";
+import { type Wall, Death, Entity } from "~/entities";
+import type { Map } from "~/utils/map";
 
 type Color = [number, number, number, number];
 
@@ -20,19 +20,21 @@ export class Sound extends Entity {
 
   private trace: SoundPoint[];
   private readonly velocity: Vector;
+  private readonly map: Map;
 
-  constructor(pos: Vector, angle: number) {
+  constructor(pos: Vector, angle: number, map: Map) {
     super();
 
     this.timestamp = 0;
     this.velocity = v(0.8).setHeading(angle);
-    this.trace = [new SoundPoint(pos)];
+    this.map = map;
+    this.trace = [this.createPoint(pos)];
   }
 
-  public static createWave(pos: Vector): Sound[] {
+  public static createWave(pos: Vector, map: Map): Sound[] {
     return [...Array(RAYS).keys()]
       .map(n => n * this.p5.TWO_PI / RAYS)
-      .map(angle => new Sound(pos, angle));
+      .map(angle => new Sound(pos, angle, map));
   }
 
   private get head() {
@@ -63,12 +65,16 @@ export class Sound extends Entity {
   private move() {
     this.trace = [
       ...this.trace,
-      new SoundPoint(v
+      this.createPoint(v
         .copy(this.velocity)
         .mult(this.p5.deltaTime)
         .add(this.head.position),
       ),
     ].slice(-100);
+  }
+
+  private createPoint(pos: Vector) {
+    return new SoundPoint(pos, this.map.deaths);
   }
 
   public render() {
@@ -84,8 +90,8 @@ export class Sound extends Entity {
       points.forEach(point => point.render());
       this.p5.endShape();
     });
-
   }
+
 }
 
 const groupPaths = (points: SoundPoint[]) => points.reduce<SoundPoint[][]>(
@@ -101,20 +107,25 @@ const groupPaths = (points: SoundPoint[]) => points.reduce<SoundPoint[][]>(
   }, []);
 
 class SoundPoint extends Entity {
-  position: Vector;
+  readonly position: Vector;
+  readonly state: State;
 
-  constructor(position: Vector) {
+  constructor(position: Vector, deaths: Death[]) {
     super();
     this.position = v.copy(position);
+    this.state = deaths
+      .some(death => death.contains(this.position))
+      ? "death"
+      : "default";
   }
 
   public render() {
     this.p5.vertex(...v.comp(this.position));
   }
 
-  public get state(): State {
-    return this.position.x < 2000
-      ? "default"
-      : "death";
-  }
+  // public getState(deaths: Death[]): State {
+  //   return deaths.some(death => death.contains(this.position))
+  //     ? "default"
+  //     : "death";
+  // }
 }

@@ -6,10 +6,10 @@ import { World } from "~/game/world";
 import footstepSound from "~/assets/foot.mp3";
 import windSound from "~/assets/wind.wav";
 
-// import Pizzicato from "pizzicato";
 import { Howl } from "howler";
+import type { Navigate } from "~/types";
 
-const DEBUG = false;
+const DEBUG = true;
 
 let world: World;
 let interval: NodeJS.Timer;
@@ -17,9 +17,7 @@ let interval: NodeJS.Timer;
 let bgSound: Howl;
 let sound: Howl;
 
-let once = false;
-
-export const sketch: Sketch = (p5) => {
+export const game = (transition: Navigate, level: number): Sketch => (p5) => {
   p5.preload = async () => {
     bgSound = new Howl({
       src: [windSound],
@@ -30,19 +28,6 @@ export const sketch: Sketch = (p5) => {
       src: [footstepSound],
     })
 
-    // bgSound.play();
-    // bgSound = new Pizzicato.Sound({
-    //   source: "file",
-    //   options: { path: windSound, loop: true },
-    // }, () => {
-    //   bgSound.play();
-    // })
-    //
-    // sound = new Pizzicato.Sound(footstepSound, () => {
-    //   // sound.addEffect(lowPassFilter)
-    //   console.log("loaded");
-    //   // sound.addEffect(reverb);
-    // });
   };
 
   p5.setup = () => {
@@ -52,9 +37,8 @@ export const sketch: Sketch = (p5) => {
     p5.background(0);
 
     world = World.init();
-
-    // sound.addEffect(reverb);
-    // bgSound.play();
+    bgSound.play();
+    bgSound.fade(0, 1, 5000);
   };
 
   p5.windowResized = () => {
@@ -67,14 +51,11 @@ export const sketch: Sketch = (p5) => {
     world.next();
 
     DEBUG && world.debug();
+
+    world.map.deaths.some(death => death.contains(world.player.position)) && die();
   };
 
   p5.touchStarted = () => {
-    if (!once) {
-      bgSound.play();
-      once = true;
-    }
-
     if (interval) return;
     createFootstep();
     interval = setInterval(createFootstep, 600);
@@ -86,14 +67,21 @@ export const sketch: Sketch = (p5) => {
   };
 
   const createFootstep = () => {
-    //   (new Pizzicato.Group([sound])).play();
-    // const s = sound.clone();
-    // s.addEffect(reverb);
-    // s.play();
-    // s.removeEffect(reverb);
     sound.play();
 
     world.player.createFootstep();
     world.sounds.push(...Sound.createWave(world.player.position, world.map));
   };
+
+  const die = () => {
+    bgSound.stop();
+    p5.remove();
+    transition("restart");
+  }
+  // const navigateLevel = (restart: boolean) => {
+  //
+  //   if (restart) {
+  //     world = World.init();
+  //   }
+  // }
 };
