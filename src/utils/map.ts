@@ -5,7 +5,6 @@ import { WallSegment, type Wall, type Death, type Goal } from "~/entities";
 type Coordinate = [number, number];
 
 export interface Map {
-  levelName: string;
   walls: Wall[];
   deaths: Death[];
   goal: Goal;
@@ -17,5 +16,18 @@ export const constructWalls = (coords: Coordinate[]): Wall[] => coords
     new WallSegment(points.at(i - 1), p),
   );
 
-export type Level = () => Map;
-export const map = (M: () => Map): Level => M;
+export type LazyMap = () => Map;
+
+export interface Level {
+  title: string;
+  number: number;
+  map: LazyMap;
+}
+
+export const map = (
+  title: string, number: number, map: LazyMap,
+): Level => ({
+  title,
+  number,
+  map,
+});

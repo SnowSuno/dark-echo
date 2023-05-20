@@ -3,8 +3,7 @@ import { constructWalls } from "~/utils/map";
 import { v } from "~/utils/vector";
 import { map } from "~/utils/map";
 
-const level = map(() => ({
-  levelName: "test",
+const level = map("Death", 2, () => ({
   walls: constructWalls([
     [-200, -100],
     [-200, 100],

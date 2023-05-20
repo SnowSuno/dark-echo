@@ -1,16 +1,19 @@
 <script lang="ts">
   import type { Navigate } from "~/types";
   import { fade } from "svelte/transition";
+  import { romanize } from "~/utils/romanize";
 
   export let navigate: Navigate;
+  export let title: string;
+  export let number: number;
 
 
   setTimeout(() => navigate("game"), 3000);
 </script>
 
 <div transition:fade={{duration: 1500}}>
-    <p>- I -</p>
-    <p>Blind</p>
+    <p>- {romanize(number)} -</p>
+    <p>{title}</p>
 </div>
 
 <style>

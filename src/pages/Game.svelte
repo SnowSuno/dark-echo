@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { fade } from "svelte/transition";
-  import P5 from "p5-svelte";
   import { game } from "~/game";
   import type { State, Navigate } from "~/types";
 
@@ -33,11 +31,11 @@
 
 {#key `${params.level}-${state}`}
     {#if state === "title"}
-        <Title {navigate}/>
+        <Title {navigate} title={level.title} number={level.number}/>
     {:else if state === "game"}
-        <Level {navigate} {level}/>
+        <Level {navigate} level={level.map}/>
     {:else if state === "restart"}
-        <Transition {navigate}/>
+        <Transition {navigate}/>s
     {:else if state === "next"}
         <Transition {navigate} {next}/>
     {/if}

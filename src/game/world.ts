@@ -1,5 +1,5 @@
-import { Entity, Player, Sound, Death, type Wall, Goal } from "~/entities";
-import type { Level } from "~/utils/map";
+import { Entity, Player, Sound } from "~/entities";
+import type { LazyMap } from "~/utils/map";
 import { v } from "~/utils/vector";
 import type { Map } from "~/utils/map";
 
@@ -9,8 +9,6 @@ export class World extends Entity {
 
   sounds: Sound[];
 
-  interval: NodeJS.Timer;
-
   private constructor(player: Player, map: Map) {
     super();
     this.player = player;
@@ -19,7 +17,7 @@ export class World extends Entity {
     this.sounds = [];
   }
 
-  public static init(level: Level) {
+  public static init(level: LazyMap) {
     return new World(
       new Player(),
       level(),

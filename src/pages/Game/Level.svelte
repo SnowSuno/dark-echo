@@ -4,10 +4,10 @@
 
   import type { Navigate } from "~/types";
   import { game } from "~/game/index.js";
-  import type { Level } from "~/utils/map";
+  import type { LazyMap } from "~/utils/map";
 
   export let navigate: Navigate;
-  export let level: Level;
+  export let level: LazyMap;
 
   // let sketch;
   // onMount(() => {

@@ -5,11 +5,11 @@ import { World } from "~/game/world";
 
 import type { Navigate } from "~/types";
 import { Audio } from "~/assets/audio";
-import type { Level } from "~/utils/map";
+import type { LazyMap } from "~/utils/map";
 
 import { DEBUG } from "~/constants";
 
-export const game = (navigate: Navigate, level: Level): Sketch => {
+export const game = (navigate: Navigate, level: LazyMap): Sketch => {
   let world: World;
   let interval: NodeJS.Timer;
 
